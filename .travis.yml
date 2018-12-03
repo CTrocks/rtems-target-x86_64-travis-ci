@@ -19,6 +19,8 @@ services:
 env:
   global:
     - TARGET_ARCH=x86_64
+    - DOCKERFILE_GIT=https://github.com/CTrocks/rtems-build-toolchain-docker.git
+    - DOCKERFILE_DIR=rtems_docker
     - DOCKER_IMAGE=rtemsbuild_$TARGET_ARCH
 
 branches:
@@ -27,10 +29,11 @@ branches:
 
 # fetch the image to use for the build
 before_script:
-  - docker pull "$IMAGE_NAME" || true
+  - git clone $DOCKERFILE_GIT $DOCKERFILE_DIR
 
 # run the build
 script:
-  - docker build --pull --cache-from $DOCKER_IMAGE --build-arg TARGET_ARCH="$TARGET_ARCH" --tag $DOCKER_IMAGE .
+  - cd $DOCKERFILE_DIR
+  - docker build --build-arg TARGET_ARCH="$TARGET_ARCH" --tag $DOCKER_IMAGE .
   - docker run -t $DOCKER_IMAGE
 
